@@ -1,0 +1,87 @@
+package com.example.honeypot.controller;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+
+@RequestMapping("/api")
+
+@CrossOrigin("*")
+
+public class HoneypotController {
+
+@Autowired
+
+private SimpMessagingTemplate messagingTemplate;
+
+
+/* Store logs temporarily */
+
+private List<Map<String,Object>> logs=new ArrayList<>();
+
+
+@PostMapping("/login")
+
+public String login(@RequestBody Map<String,String> body,
+
+HttpServletRequest request){
+
+
+String ip=request.getRemoteAddr();
+
+int port=request.getRemotePort();
+
+String payload=body.toString();
+
+String attackType="Normal";
+
+
+if(payload.contains("OR") || payload.contains("'"))
+
+attackType="SQL Injection";
+
+
+Map<String,Object> log=new HashMap<>();
+
+log.put("id",logs.size()+1);
+
+log.put("ip",ip);
+
+log.put("port",port);
+
+log.put("attackType",attackType);
+
+log.put("timestamp",LocalDateTime.now());
+
+
+logs.add(log);
+
+
+/* Send to WebSocket */
+
+messagingTemplate.convertAndSend("/topic/attacks", (Object) log);
+
+
+return "Login Failed";
+
+}
+
+
+/* Dashboard fetch */
+
+@GetMapping("/attacks")
+
+public List<Map<String,Object>> getLogs(){
+
+return logs;
+
+}
+
+}

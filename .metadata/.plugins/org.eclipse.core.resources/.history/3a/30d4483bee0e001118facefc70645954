@@ -1,0 +1,45 @@
+package com.example.honeypot.ai;
+
+public class AttackAnalyzer {
+
+public static String[] analyze(String payload){
+
+String type="Normal";
+String desc="Normal user activity";
+String solution="No action needed";
+
+if(payload.contains("OR") || payload.contains("'")){
+
+type="SQL Injection";
+
+desc="Attacker tried to bypass login using SQL manipulation.";
+
+solution="Use Prepared Statements and input validation.";
+
+}
+
+else if(payload.contains("<script>")){
+
+type="XSS Attack";
+
+desc="Attacker tried to inject malicious script.";
+
+solution="Use input sanitization and CSP headers.";
+
+}
+
+else if(payload.length()>50){
+
+type="Suspicious Payload";
+
+desc="Large unusual input detected.";
+
+solution="Limit input size and validate.";
+
+}
+
+return new String[]{type,desc,solution};
+
+}
+
+}

@@ -1,0 +1,119 @@
+package com.example.honeypot.controller;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.honeypot.model.AttackLog;
+import com.example.honeypot.repository.AttackLogRepository;
+import com.example.honeypot.ai.AttackAnalyzer;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
+
+public class HoneypotController {
+
+    @Autowired
+    private AttackLogRepository repo;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+
+    // LOGIN HONEYPOT ENDPOINT
+    @PostMapping("/login")
+    public String login(@RequestBody Map<String,String> body,
+                        HttpServletRequest request){
+
+        // Capture IP address
+        String ip = request.getHeader("X-Forwarded-For");
+
+        if(ip == null || ip.isEmpty()){
+            ip = request.getRemoteAddr();
+        }
+
+        // Convert IPv6 localhost to IPv4
+        if(ip.equals("0:0:0:0:0:0:0:1")){
+            ip = "127.0.0.1";
+        }
+
+
+        // Capture Port
+        int port = request.getRemotePort();
+
+
+        // Capture payload
+        String payload = body.toString();
+
+
+        // Basic detection
+        String attackType = "Normal";
+
+        if(payload.contains("OR") || payload.contains("'")){
+            attackType = "SQL Injection";
+        }
+
+
+        // ✅ AI ANALYSIS
+        String[] aiResult = AttackAnalyzer.analyze(payload);
+
+        String aiType = aiResult[0];
+
+        String aiDescription = aiResult[1];
+
+        String aiSolution = aiResult[2];
+
+
+
+        // Create log object
+        AttackLog log = new AttackLog();
+
+        log.setIp(ip);
+
+        log.setPort(port);
+
+        log.setAttackType(attackType);
+
+        log.setTimestamp(LocalDateTime.now());
+
+
+        // Save AI results
+        log.setAiAttackType(aiType);
+
+        log.setAiDescription(aiDescription);
+
+        log.setAiSolution(aiSolution);
+
+
+
+        // Save to MySQL
+        repo.save(log);
+
+
+
+        // Send to WebSocket dashboard
+        messagingTemplate.convertAndSend("/topic/attacks", log);
+
+
+
+        return "Login Failed";
+    }
+
+
+
+    // FETCH LOGS FOR DASHBOARD
+    @GetMapping("/attacks")
+    public List<AttackLog> getLogs(){
+
+        return repo.findAll();
+    }
+
+
+}

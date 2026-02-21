@@ -1,0 +1,71 @@
+package com.example.honeypot.controller;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.honeypot.model.AttackLog;
+import com.example.honeypot.repository.AttackLogRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+
+@RequestMapping("/api")
+
+@CrossOrigin("*")
+
+public class HoneypotController {
+
+@Autowired
+
+AttackLogRepository repo;
+
+@Autowired
+
+SimpMessagingTemplate messagingTemplate;
+
+
+@PostMapping("/login")
+
+public String login(@RequestBody Map<String,String> body,
+
+HttpServletRequest request){
+
+String ip=request.getRemoteAddr();
+
+int port=request.getRemotePort();
+
+String payload=body.toString();
+
+String attackType="Normal";
+
+if(payload.contains("OR")||payload.contains("'"))
+
+attackType="SQL Injection";
+
+
+AttackLog log=new AttackLog(ip,port,attackType,LocalDateTime.now());
+
+repo.save(log);
+
+messagingTemplate.convertAndSend("/topic/attacks",(Object) log);
+
+return "Login Failed";
+
+}
+
+
+@GetMapping("/attacks")
+
+public List<AttackLog> getLogs(){
+
+return repo.findAll();
+
+}
+
+}

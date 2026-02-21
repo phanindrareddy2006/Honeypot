@@ -1,0 +1,33 @@
+package com.example.honeypot.ai;
+
+public class AttackAnalyzer {
+
+    public static String[] analyze(String payload){
+
+        String type="Normal";
+        String desc="Normal activity detected.";
+        String solution="No action needed.";
+
+        if(payload.contains("OR") || payload.contains("'")){
+
+            type="SQL Injection";
+
+            desc="Attacker attempted SQL Injection to bypass authentication.";
+
+            solution="Use Prepared Statements and validate user input.";
+        }
+
+        else if(payload.contains("<script>")){
+
+            type="XSS Attack";
+
+            desc="Attacker attempted Cross Site Scripting.";
+
+            solution="Sanitize input and enable CSP headers.";
+        }
+
+        return new String[]{type,desc,solution};
+
+    }
+
+}

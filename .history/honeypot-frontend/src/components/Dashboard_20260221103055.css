@@ -1,0 +1,51 @@
+/* Dashboard.css */
+
+.dashboard {
+
+  padding: 40px;
+
+}
+
+.dashboard h2 {
+
+  margin-bottom: 20px;
+
+  color: #38bdf8;
+
+}
+
+table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  background: rgba(15, 23, 42, 0.95);
+
+}
+
+th {
+
+  background: #020617;
+
+  padding: 14px;
+
+  text-align: left;
+
+  border-bottom: 2px solid #38bdf8;
+
+}
+
+td {
+
+  padding: 12px;
+
+  border-bottom: 1px solid #1e293b;
+
+}
+
+tr:hover {
+
+  background: rgba(56, 189, 248, 0.1);
+
+}

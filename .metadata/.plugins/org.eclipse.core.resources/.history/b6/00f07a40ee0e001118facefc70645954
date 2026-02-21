@@ -1,0 +1,47 @@
+package com.example.honeypot.model;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+
+@Table(name="attack_logs")
+
+public class AttackLog {
+
+@Id
+
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+
+private int id;
+
+private String ip;
+
+private int port;
+
+private String attackType;
+
+private LocalDateTime timestamp;
+
+public AttackLog(){}
+
+public AttackLog(String ip,int port,String attackType,LocalDateTime timestamp){
+
+this.ip=ip;
+this.port=port;
+this.attackType=attackType;
+this.timestamp=timestamp;
+
+}
+
+public int getId(){ return id;}
+
+public String getIp(){ return ip;}
+
+public int getPort(){ return port;}
+
+public String getAttackType(){ return attackType;}
+
+public LocalDateTime getTimestamp(){ return timestamp;}
+
+}
