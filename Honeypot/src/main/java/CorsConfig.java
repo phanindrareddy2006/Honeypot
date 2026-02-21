@@ -15,7 +15,13 @@ return new WebMvcConfigurer(){
 public void addCorsMappings(CorsRegistry registry){
 
 registry.addMapping("/**")
-.allowedOrigins("http://localhost:5173")
+.allowedOrigins(
+
+"http://localhost:5173",
+"https://honeypot.tooncore.me",
+"https://honeypot-2nso.onrender.com"
+
+)
 .allowedMethods("*")
 .allowedHeaders("*");
 
