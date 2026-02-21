@@ -38,7 +38,7 @@ fetchLogs();
 
 
 // auto refresh every 3 seconds
-const interval = setInterval(fetchLogs, 3000);
+const interval = setInterval(fetchLogs, 10000);
 
 
 // cleanup
