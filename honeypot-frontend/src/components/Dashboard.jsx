@@ -7,7 +7,7 @@ const [logs, setLogs] = useState([]);
 
 useEffect(() => {
 
-fetch("http://localhost:8081/api/attacks")
+fetch("https://honeypot-2nso.onrender.com/api/attacks")
 
 .then(res => res.json())
 
